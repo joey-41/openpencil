@@ -273,6 +273,7 @@ async function main(): Promise<void> {
       await cmdExport(positionals, {
         file: globalFlags.file,
         out: flags.out as string | undefined,
+        page: globalFlags.page,
       })
       break
     }

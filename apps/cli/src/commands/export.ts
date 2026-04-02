@@ -15,7 +15,7 @@ import { output, outputError } from '../output'
 
 type GeneratorResult = string | { html: string; css: string }
 
-const GENERATORS: Record<string, (doc: any) => GeneratorResult> = {
+const GENERATORS: Record<string, (doc: any, activePageId?: string | null) => GeneratorResult> = {
   react: generateReactFromDocument,
   html: generateHTMLFromDocument,
   vue: generateVueFromDocument,
@@ -39,7 +39,7 @@ function resultToString(result: GeneratorResult): string {
 
 export async function cmdExport(
   args: string[],
-  flags: { file?: string; out?: string },
+  flags: { file?: string; out?: string; page?: string },
 ): Promise<void> {
   const format = args[0]
   if (!format) {
@@ -54,7 +54,9 @@ export async function cmdExport(
 
   const filePath = resolveDocPath(flags.file)
   const doc = await openDocument(filePath)
-  const result = generator(doc)
+  // Pass null to use first page for multi-page docs, or specific page if --page provided
+  const activePageId = flags.page ?? null
+  const result = generator(doc, activePageId)
   const code = resultToString(result)
 
   if (flags.out) {
